@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" role="img" aria-label="Abstract city conversation image">
+  <rect width="900" height="560" fill="#eaf3f7"/>
+  <path d="M0 393c86-44 159-58 240-42 92 18 166 78 279 71 120-7 180-83 279-93 45-5 80 3 102 13v218H0z" fill="#c6dbe5"/>
+  <rect x="86" y="164" width="132" height="282" rx="8" fill="#fefefe"/>
+  <rect x="262" y="100" width="182" height="346" rx="10" fill="#d7edf5"/>
+  <rect x="491" y="144" width="126" height="302" rx="8" fill="#ffffff"/>
+  <rect x="660" y="73" width="152" height="373" rx="10" fill="#d0e1e9"/>
+  <g fill="#6ba6bf">
+    <rect x="112" y="195" width="28" height="28" rx="6"/>
+    <rect x="160" y="195" width="28" height="28" rx="6"/>
+    <rect x="112" y="251" width="28" height="28" rx="6"/>
+    <rect x="160" y="251" width="28" height="28" rx="6"/>
+    <rect x="292" y="137" width="36" height="32" rx="6"/>
+    <rect x="350" y="137" width="36" height="32" rx="6"/>
+    <rect x="292" y="202" width="36" height="32" rx="6"/>
+    <rect x="350" y="202" width="36" height="32" rx="6"/>
+    <rect x="520" y="184" width="28" height="28" rx="6"/>
+    <rect x="562" y="184" width="28" height="28" rx="6"/>
+    <rect x="698" y="117" width="36" height="32" rx="6"/>
+    <rect x="754" y="117" width="36" height="32" rx="6"/>
+    <rect x="698" y="184" width="36" height="32" rx="6"/>
+    <rect x="754" y="184" width="36" height="32" rx="6"/>
+  </g>
+  <circle cx="575" cy="95" r="42" fill="#ffd36e"/>
+  <path d="M106 451h650" stroke="#86a8b7" stroke-width="10" stroke-linecap="round"/>
+</svg>

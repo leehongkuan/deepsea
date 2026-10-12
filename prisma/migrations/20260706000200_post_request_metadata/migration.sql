@@ -1,0 +1,4 @@
+ALTER TABLE `posts`
+  ADD COLUMN `ipAddress` VARCHAR(45) NULL,
+  ADD COLUMN `ipLocation` VARCHAR(120) NULL,
+  ADD COLUMN `userAgent` VARCHAR(512) NULL;

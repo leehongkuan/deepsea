@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" role="img" aria-label="Abstract notes and media grid image">
+  <rect width="900" height="560" fill="#eef2f4"/>
+  <rect x="86" y="72" width="222" height="180" rx="18" fill="#ffffff"/>
+  <rect x="338" y="72" width="222" height="180" rx="18" fill="#d8eef6"/>
+  <rect x="592" y="72" width="222" height="180" rx="18" fill="#ffffff"/>
+  <rect x="86" y="292" width="348" height="196" rx="18" fill="#d5e3ea"/>
+  <rect x="466" y="292" width="348" height="196" rx="18" fill="#ffffff"/>
+  <g stroke="#7b919d" stroke-width="13" stroke-linecap="round">
+    <path d="M123 121h120M123 158h88M123 195h142"/>
+    <path d="M627 121h120M627 158h88M627 195h142"/>
+    <path d="M505 341h220M505 383h168M505 426h245"/>
+  </g>
+  <circle cx="449" cy="162" r="50" fill="#0f8fd6"/>
+  <path d="M387 216c28-50 59-62 93-28 23-24 45-25 66 0v34H387z" fill="#ffffff"/>
+  <path d="M133 439c56-72 103-84 154-33 42-50 82-56 118-13v55H133z" fill="#ffffff"/>
+</svg>

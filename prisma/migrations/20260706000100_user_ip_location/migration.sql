@@ -1,0 +1,3 @@
+ALTER TABLE `users`
+  ADD COLUMN `ipAddress` VARCHAR(45) NULL,
+  ADD COLUMN `ipLocation` VARCHAR(120) NULL;
