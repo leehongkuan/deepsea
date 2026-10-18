@@ -1,182 +1,265 @@
-# deepSea 项目接手说明
+# deepSea
 
-这份文档用于在新的 Codex / AI 对话中快速恢复项目上下文。文档刻意不包含任何生产用户名、密码、IP、邀请码、证书路径或私有连接串。
+A multilingual social networking prototype inspired by X and Bluesky, built with Next.js, React, TypeScript, Prisma, and MySQL. deepSea brings timelines, media posts, social interactions, and content moderation together in a clean, ocean-themed interface.
 
-## 1. 项目介绍
+[English](#english) | [简体中文](#简体中文)
 
-deepSea 是一个类 X.com / Bluesky 的社交网站原型，当前以快速迭代为主。
+## English
 
-核心目标：
+### Overview
 
-- 用户注册、登录后才能浏览和发言。
-- 首页是时间线，可以发 post、上传图片和视频、互动。
-- UI 简洁，左侧导航 + 中间内容区，不做 X 右侧信息栏。
-- 支持中文、英文、日文 UI。
-- 品牌为 `deepSea`，包含海豚 logo、favicon、海底首页背景和海洋动物 avatar。
+deepSea is a self-hosted social web application for learning, experimentation, and rapid product development. Users sign up with an invitation code, sign in, share posts and media, and follow other people. The interface supports English, Simplified Chinese, and Japanese.
 
-本地开发地址：
+This project is an evolving prototype. Review authentication, upload handling, backups, and operational security before running a public community.
 
-- `http://localhost:3000`
+### Features
 
-## 2. 技术栈
+- **Accounts:** invitation-based registration, session-based login, profile editing, and account settings.
+- **Timelines:** For you and Following feeds, user profiles, and follower/following lists.
+- **Posts and comments:** up to 5,000 characters, image/video attachments, and post editing and deletion.
+- **Interactions:** likes, reposts, bookmarks, share links, view counts, and notifications.
+- **Discovery:** search posts and authors.
+- **Moderation:** report posts or comments with a selected reason; block and unblock users.
+- **Administration:** separate admin login, user search, password resets, account posting restrictions, reported-content review, content hiding, and database backups.
+- **Languages:** English, Simplified Chinese, and Japanese UI, plus localized Terms of Service and Privacy Policy pages.
 
-- Framework: Next.js 15 App Router
-- Language: TypeScript
-- UI: React 19
-- Styling: `app/globals.css` 手写 CSS
-- Icons: `lucide-react`
-- Database: MySQL
-- ORM: Prisma
-- Auth: 自建 session cookie，cookie 名为 `myx_session`
-- Admin Auth: 独立后台 session cookie，cookie 名为 `deepsea_admin_session`
-- Upload: 本地 `public/uploads/`
-- Image processing: `sharp` + `heic-convert`
+### Technology
 
-注意：
+| Layer | Technology |
+| --- | --- |
+| Application | Next.js 15 App Router, React 19, TypeScript |
+| Styling and icons | Custom CSS, Lucide React |
+| Database | MySQL, Prisma ORM |
+| Authentication | Custom cookie-based sessions; separate admin sessions |
+| Media | Local file storage, Sharp, heic-convert |
 
-- 当前项目没有使用 Tailwind。
-- 上传文件本地存在 `public/uploads/`，该目录只保留 `.gitkeep`。
-- HEIC/HEIF 转换依赖 `heic-convert` 的 WASM 包，`npm run build` 时可能出现 `libheif-js` dynamic require warning，目前 build 可通过。
+### Getting Started
 
-## 3. 常用命令
+Prerequisites: Node.js 22, npm, and a running MySQL database. Create a database and a database user with access to it before applying migrations.
 
-```bash
-npm run dev
-npm run build
-npx tsc --noEmit
-npm run db:migrate
-npm run db:generate
-npm run db:studio
-```
+1. Clone the repository and install dependencies:
 
-环境变量参考 `.env.example`，真实 `.env` 不要提交。
+   ```bash
+   git clone https://github.com/leehongkuan/deepsea.git
+   cd deepsea
+   npm ci
+   ```
 
-开发时经常在运行 `npm run build` 后重启 dev server，避免浏览器加载旧的 `.next` chunk。
+2. Copy the environment template:
 
-## 4. 目录结构
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit `.env` with your own database credentials and a long, randomly generated session secret. The values below are placeholders:
+
+   ```dotenv
+   DATABASE_URL="mysql://<db_user>:<db_password>@127.0.0.1:3306/x_clone_dev"
+   SESSION_SECRET="<replace-with-a-long-random-string>"
+   ```
+
+   URL-encode special characters in the database username or password. Keep `.env` out of version control.
+
+3. Generate the Prisma client and apply the existing migrations:
+
+   ```bash
+   npm run db:generate
+   npx prisma migrate deploy
+   ```
+
+4. Create an invitation code for registration:
+
+   ```bash
+   npm run db:studio
+   ```
+
+   Open the `InviteCode` model in Prisma Studio, add a record with your chosen unique `code`, keep `active` enabled, and save it. Let Prisma populate the default fields. The public source includes no seeded invitation code or administrator account.
+
+5. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000), choose **Create account**, and register using the invitation code you created.
+
+### Usage
+
+After signing in, publish a post from the timeline, attach media, or open a post to reply. Visit a user's profile to follow or block them. Use Explore to search, Bookmarks to revisit saved posts, and Settings to update account details. Select a reason in the report dialog before submitting a report.
+
+The admin interface is available at `/admin` and uses a separate account. Initial administrator provisioning is manual: create an `AdminUser` record with a password hash generated by `hashPassword` in `lib/password.ts`. Never store a plaintext password in `passwordHash`. No bootstrap command is currently provided.
+
+### Media Limits
+
+| Item | Limit or behavior |
+| --- | --- |
+| Attachments per post | Up to 9 |
+| Image size | Up to 10 MB per file |
+| Video size | Up to 35 MB per file |
+| Images | JPG, PNG, WebP, GIF, HEIC/HEIF |
+| Videos | MP4, WebM, MOV |
+| Image processing | Non-GIF images are converted to WebP, with a maximum long edge of 2,560 px; GIFs retain animation |
+| Storage | `public/uploads/`; provide persistent storage when deploying |
+
+### Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm start` | Run the production build |
+| `npx tsc --noEmit` | Check TypeScript types |
+| `npm run db:generate` | Generate the Prisma client |
+| `npm run db:migrate` | Create/apply migrations during local schema development |
+| `npx prisma migrate deploy` | Apply existing migrations in a deployment |
+| `npm run db:studio` | Inspect and edit data with Prisma Studio |
+
+### Project Structure
 
 ```text
-app/
-  page.tsx                         # 首页 / 登录后的主时间线 / 未登录 landing
-  layout.tsx                       # 全局 layout
-  globals.css                      # 全站样式
-  login/page.tsx                   # 登录页面
-  register/page.tsx                # 注册页面
-  terms/page.tsx                   # 服务条款
-  privacy/page.tsx                 # 隐私政策
-  explore/page.tsx                 # 搜索 post 页面
-  notifications/page.tsx           # 通知页面
-  bookmarks/page.tsx               # 书签页面
-  settings/page.tsx                # 设置页面
-  admin/page.tsx                   # 独立后台管理页面
-  profile/page.tsx                 # 当前用户个人主页
-  profile/edit/page.tsx            # 编辑当前用户资料
-  users/[username]/page.tsx        # 其他用户主页
-  users/[username]/follows/page.tsx# followers / following 用户列表
-  posts/[postId]/page.tsx          # post 详情、评论、编辑、删除
-  components/
-    ComposerBox.tsx
-    MediaGrid.tsx
-    PostListPage.tsx
-    ReportDialog.tsx
-    LegalPage.tsx
-  api/
-    admin/*
-    auth/*
-    posts/*
-    comments/*
-    users/*
-    profile/*
-    settings/route.ts
-    uploads/route.ts
-    notifications/route.ts
-lib/
-  api.ts
-  auth.ts
-  admin-auth.ts
-  avatars.ts
-  notifications.ts
-  password.ts
-  posts.ts
-  prisma.ts
-  shared.ts
-prisma/
-  schema.prisma
-  migrations/
-public/
-  avatars/
-  uploads/
-  deepsea-logo.svg
-  deepsea-landing-bg.png
-middleware.ts
+app/                 Pages, API routes, and global styles
+app/components/      Shared composer, media, report, and legal components
+lib/                 Authentication, database, and application helpers
+prisma/              Database schema and migrations
+public/              Branding, avatars, and local uploads
+middleware.ts        Access control for protected routes
 ```
 
-## 5. 数据模型概览
+### Deployment Notes
 
-主要 Prisma 模型：
+Configure the environment, install dependencies, generate the Prisma client, apply migrations, build, and run `npm start`. Uploaded files need a writable, persistent directory and a backup strategy. The admin database-backup feature requires `mysqldump` on the server.
 
-- `User`: 用户资料、语言、头像、简介、IP/地区记录、无效化状态。
-- `AdminUser` / `AdminSession`: 后台管理员和后台 session。
-- `InviteCode`: 注册邀请码。公开源码不应包含真实邀请码 seed。
-- `Session`: 普通用户 session。
-- `Post`: post 正文、媒体、软删除、创建请求元数据。
-- `Media`: post 图片 / 视频。
-- `Comment` / `CommentMedia`: 评论和评论媒体。
-- `Like`, `Bookmark`, `Repost`, `PostView`, `Notification`, `Follow`。
-- `Report`: post/comment 举报。
-- `UserBlock`: 用户屏蔽关系。
+HEIC conversion may produce a `libheif-js` dynamic-require warning during builds. After switching between production builds and development, restart the development server if stale Next.js chunks cause module errors.
 
-共享前端类型在 `lib/shared.ts`。
+Do not commit credentials, database dumps, user uploads, or private deployment details. Keep development-only admin tools private. Pagination, broader automated tests, object storage, and additional authentication hardening remain areas for future work.
 
-## 6. 已完成功能
+## 简体中文
 
-- 注册、登录、退出、邀请码注册。
-- 登录后时间线、For you / Following feed。
-- 发帖、评论、图片/视频上传、HEIC/HEIF 转换。
-- like、bookmark、repost、share、view count。
-- post 编辑 / 删除。
-- profile、用户主页、关注/取消关注、关注列表。
-- 搜索、通知、设置、书签。
-- post/comment 举报，带原因选择对话框。
-- 用户主页 block / unblock。
-- 后台用户管理、密码重置、账号无效化/恢复、数据库备份、reported content 列表、隐藏 post/comment。
-- Terms of Service 和 Privacy Policy，支持 `zh / en / ja`。
+### 项目介绍
 
-## 7. 后续计划
+deepSea 是一个参考 X 和 Bluesky 的多语言社交网站原型，使用 Next.js、React、TypeScript、Prisma 和 MySQL 构建。项目采用简洁的海洋主题界面，整合时间线、媒体发帖、社交互动和内容管理功能。
 
-1. Quote repost。
-2. hashtag 和 mention。
-3. 通知详情和已读状态 UI。
-4. 用户头像自定义上传。
-5. 评论编辑 / 删除。
-6. 更完整的 profile tabs。
-7. 后台内容审计、删除/隐藏内容、管理员操作日志。
-8. 邀请码后台管理页面。
-9. 视频转码或缩略图。
-10. 对象存储或可靠上传备份策略。
-11. 分页 / 无限滚动。
-12. 更完整的测试覆盖。
-13. 生产运维增强。
+项目适合自主部署、学习实践和快速产品开发。用户通过邀请码注册，登录后可以发布内容、上传媒体和关注其他用户。界面支持英语、简体中文和日语。
 
-## 8. 开发注意事项
+当前项目仍处于原型迭代阶段。面向公众运营前，请检查身份验证、上传处理、备份和运维安全。
 
-- 修改前先用 `rg` 找现有模式。
-- 媒体展示优先复用 `app/components/MediaGrid.tsx`。
-- post / comment 输入框优先复用 `app/components/ComposerBox.tsx`。
-- Prisma 查询 post/comment 媒体时要选择 `{ type: true, url: true }`。
-- 修改 `AppPost`、`AppComment`、`AppMedia` 类型后，要同步检查 `lib/posts.ts` 和相关 API include/select。
-- 修改 Prisma schema 后，本地开发用 `npm run db:migrate`；生产部署使用 `npx prisma migrate deploy`。
-- 后台权限相关代码主要在 `lib/admin-auth.ts`、`app/api/admin/*`、`app/admin/page.tsx`。
-- 常规验证：
+### 主要功能
 
-```bash
-npx tsc --noEmit
-npm run build
+- **账户管理：** 邀请码注册、会话登录、个人资料编辑和账户设置。
+- **时间线：** For you / Following 信息流、用户主页和关注者/关注列表。
+- **帖子与评论：** 最多 5,000 字，支持图片和视频，以及帖子的编辑和删除。
+- **社交互动：** 点赞、转发、书签、分享链接、浏览统计和通知。
+- **内容发现：** 搜索帖子和作者。
+- **内容治理：** 选择原因举报帖子或评论，屏蔽和取消屏蔽用户。
+- **后台管理：** 独立管理员登录、用户搜索、密码重置、账号发言限制、举报审核、内容隐藏和数据库备份。
+- **多语言：** 英语、简体中文和日语界面，以及对应语言的服务条款和隐私政策页面。
+
+### 技术栈
+
+| 层级 | 技术 |
+| --- | --- |
+| 应用框架 | Next.js 15 App Router、React 19、TypeScript |
+| 样式与图标 | 手写 CSS、Lucide React |
+| 数据库 | MySQL、Prisma ORM |
+| 身份验证 | 自建 Cookie 会话，后台使用独立会话 |
+| 媒体处理 | 本地文件存储、Sharp、heic-convert |
+
+### 快速开始
+
+环境要求：Node.js 22、npm，以及运行中的 MySQL 数据库。执行迁移前，请先创建数据库和具备相应权限的数据库用户。
+
+1. 克隆仓库并安装依赖：
+
+   ```bash
+   git clone https://github.com/leehongkuan/deepsea.git
+   cd deepsea
+   npm ci
+   ```
+
+2. 复制环境变量模板：
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   编辑 `.env`，填写自己的数据库连接信息，并设置足够长的随机会话密钥。以下值仅为占位符：
+
+   ```dotenv
+   DATABASE_URL="mysql://<db_user>:<db_password>@127.0.0.1:3306/x_clone_dev"
+   SESSION_SECRET="<replace-with-a-long-random-string>"
+   ```
+
+   数据库用户名或密码中的特殊字符需要进行 URL 编码。不要将 `.env` 提交到版本控制。
+
+3. 生成 Prisma 客户端并应用已有迁移：
+
+   ```bash
+   npm run db:generate
+   npx prisma migrate deploy
+   ```
+
+4. 创建注册邀请码：
+
+   ```bash
+   npm run db:studio
+   ```
+
+   在 Prisma Studio 中打开 `InviteCode` 模型，新增一条记录，填写自己选择的唯一 `code`，保持 `active` 启用并保存。带默认值的字段由 Prisma 自动生成。公开源码不预置邀请码或管理员账号。
+
+5. 启动开发服务器：
+
+   ```bash
+   npm run dev
+   ```
+
+   打开 [http://localhost:3000](http://localhost:3000)，选择 **Create account**，使用刚创建的邀请码注册。
+
+### 使用方法
+
+登录后，可以在时间线发布帖子、添加媒体，或打开帖子详情进行回复。进入用户主页可以关注或屏蔽对方。通过 Explore 搜索内容，通过 Bookmarks 查看收藏，通过 Settings 修改账户信息。举报时，需要先在对话框中选择原因才能提交。
+
+后台入口为 `/admin`，使用独立账号。初始管理员需要手动配置：使用 `lib/password.ts` 中的 `hashPassword` 生成密码哈希，再创建 `AdminUser` 记录。不要把明文密码填入 `passwordHash` 字段。目前没有管理员初始化命令。
+
+### 媒体限制
+
+| 项目 | 限制或处理方式 |
+| --- | --- |
+| 每篇帖子附件数 | 最多 9 个 |
+| 图片大小 | 每个文件最多 10 MB |
+| 视频大小 | 每个文件最多 35 MB |
+| 图片格式 | JPG、PNG、WebP、GIF、HEIC/HEIF |
+| 视频格式 | MP4、WebM、MOV |
+| 图片处理 | 非 GIF 图片转换为 WebP，最长边不超过 2,560 像素；GIF 保留动画 |
+| 存储位置 | `public/uploads/`；部署时需要持久化存储 |
+
+### 常用命令
+
+| 命令 | 用途 |
+| --- | --- |
+| `npm run dev` | 启动开发服务器 |
+| `npm run build` | 构建生产版本 |
+| `npm start` | 运行生产版本 |
+| `npx tsc --noEmit` | 检查 TypeScript 类型 |
+| `npm run db:generate` | 生成 Prisma 客户端 |
+| `npm run db:migrate` | 本地修改数据库结构时创建并应用迁移 |
+| `npx prisma migrate deploy` | 部署时应用已有迁移 |
+| `npm run db:studio` | 使用 Prisma Studio 查看和编辑数据 |
+
+### 目录结构
+
+```text
+app/                 页面、API 路由和全局样式
+app/components/      共用输入框、媒体、举报和法律文档组件
+lib/                 身份验证、数据库和应用辅助逻辑
+prisma/              数据库模型和迁移
+public/              品牌资源、头像和本地上传文件
+middleware.ts        受保护路由的访问控制
 ```
 
-## 9. 安全提交规则
+### 部署说明
 
-- 不提交 `.env`、真实数据库连接串、session secret、证书、服务器 IP、SSH 信息、真实邀请码、真实后台用户名或密码。
-- 不提交 `public/uploads/` 内用户上传文件。
-- 不提交 `.next/`、`.next.*/`、`node_modules/`、`storage/` 或本地备份。
-- 公开迁移文件不应 seed 真实邀请码或真实管理员账号。
+配置环境变量、安装依赖、生成 Prisma 客户端、执行数据库迁移并完成构建后，通过 `npm start` 运行。上传目录需要可写、持久化，并配置备份策略。后台数据库备份功能需要服务器安装 `mysqldump`。
+
+HEIC 转换依赖可能在构建时产生 `libheif-js` dynamic-require 警告。在生产构建与开发模式之间切换后，如果旧的 Next.js chunk 导致模块错误，请重启开发服务器。
+
+不要提交真实凭据、数据库备份、用户上传文件或私有部署信息。开发用管理工具应限制访问。分页、更完整的自动化测试、对象存储和身份验证加固仍是后续改进方向。
