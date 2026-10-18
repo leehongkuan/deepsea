@@ -4,6 +4,9 @@ A multilingual social networking prototype inspired by X and Bluesky, built with
 
 [English](#english) | [简体中文](#简体中文)
 
+# Website
+[deepSea](https://synapse-etl.uk/)
+
 ## English
 
 ### Overview
